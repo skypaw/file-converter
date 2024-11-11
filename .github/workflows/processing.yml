@@ -1,0 +1,47 @@
+<<<<<<< Updated upstream:.github/workflow/processing.yml
+name: Batch Processing Pipeline
+
+on: [ push ]
+
+jobs:
+  find-files:
+    runs-on: ubuntu-latest
+    outputs:
+      inputs: ${{ steps.bash.outputs.inputs }}
+    steps:
+      - id: bash
+        run: echo "inputs=$(IFS=,; echo \"./inputs\"/*)" >> "$GITHUB_OUTPUT"
+
+  concurrent:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        inputs: ${{needs.find-files.outputs.inputs}}
+    steps:
+      - uses: skypaw/mm/.github/workflows/reusable.yml
+        with:
+          input-file: ${{ matrix.inputs }}
+=======
+name: Batch Processing Pipeline
+
+on: workflow_dispatch
+
+jobs:
+  find-files:
+    runs-on: ubuntu-latest
+    outputs:
+      inputs: ${{ steps.bash.outputs.inputs }}
+    steps:
+      - id: bash
+        run: echo "inputs=$(IFS=,; echo \"./inputs\"/*)" >> "$GITHUB_OUTPUT"
+
+  concurrent:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        inputs: ${{needs.find-files.outputs.inputs}}
+    steps:
+      - uses: skypaw/mm/.github/workflows/reusable.yml
+        with:
+          input-file: ${{ matrix.inputs }}
+>>>>>>> Stashed changes:.github/workflows/processing.yml
