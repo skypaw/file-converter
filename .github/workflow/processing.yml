@@ -1,6 +1,6 @@
 name: Batch Processing Pipeline
 
-on: [ push ]
+on: workflow_dispatch
 
 jobs:
   find-files:
