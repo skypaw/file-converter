@@ -9,6 +9,8 @@ PARSER = argparse.ArgumentParser(
 logger = logging.getLogger("converter")
 logger.setLevel("INFO")
 
+KEYWORDS = ["Full Name", "Social Security Number", "Telephone Number"]
+
 
 class FileNotTxtException(Exception):
     pass
@@ -53,6 +55,11 @@ class ConvertFile:
     def __input_generator(self):
         for line in open(file=self.arguments["input"], mode="r", errors="ignore"):
             yield line
+
+    def __filter_keywords(self, line):
+        for keyword in KEYWORDS:
+            position = line.find(keyword)
+
 
     def process(self):
         with open(file=self.arguments["output"], mode="wb") as output:
