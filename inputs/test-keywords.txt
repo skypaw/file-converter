@@ -1,0 +1,4 @@
+shouldn't be masked Address Foo
+Telephone Number 123123123
+Telephone Number123123123 another data basic filter will mask it too
+Before name shouldn't be masked Full Name Foo Bar

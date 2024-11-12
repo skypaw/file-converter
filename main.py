@@ -65,17 +65,24 @@ class ConvertFile:
 
     def __load_keywords(self):
         for keyword in open(
-                file=pathlib.Path("filter-keywords.txt"), mode="r", errors="ignore"
+            file=pathlib.Path("filter-keywords.txt"), mode="r", errors="ignore"
         ):
-            self.__keywords.append(keyword)
+            self.__keywords.append(keyword.rstrip())
 
     def __filter_keywords(self, line):
         for keyword in self.__keywords:
-            position = line.find(keyword)
+            if keyword in line:
+                kw_len = len(keyword)
+                position = line.find(keyword)
+                line = (
+                    line[: position + kw_len] + "*" * (len(line) - position - kw_len) + "\n"
+                )
+        return line
 
     def process(self):
         with open(file=self.__arguments["output"], mode="wb") as output:
             for line in self.__input_generator():
+                line = self.__filter_keywords(line)
                 encoded = line.encode("utf-8", errors="ignore")
                 output.write(encoded)
 
