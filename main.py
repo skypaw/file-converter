@@ -9,10 +9,12 @@ PARSER = argparse.ArgumentParser(
 logger = logging.getLogger("converter")
 logger.setLevel("INFO")
 
-KEYWORDS = ["Full Name", "Social Security Number", "Telephone Number"]
-
 
 class FileNotTxtException(Exception):
+    pass
+
+
+class FileOutsideWorkingDirException(Exception):
     pass
 
 
@@ -41,28 +43,38 @@ def check_file_exists(arguments) -> None:
         raise FileExistsError
 
 
-def check_extensions(arguments) -> None:
-    extension_input = os.path.splitext(arguments["input"])[-1]
-    extension_output = os.path.splitext(arguments["output"])[-1]
-    if not extension_input == ".txt" or not extension_output == ".txt":
+def check_path(path) -> None:
+    path_split = os.path.splitext(path)
+    extension_input = path_split[-1]
+
+    if not extension_input == ".txt":
         raise FileNotTxtException
+    if ".." in path_split[0] or "~" in path_split[0]:
+        raise FileOutsideWorkingDirException
 
 
 class ConvertFile:
     def __init__(self, arguments):
-        self.arguments = arguments
+        self.__arguments = arguments
+        self.__keywords = []
+        self.__load_keywords()
 
     def __input_generator(self):
-        for line in open(file=self.arguments["input"], mode="r", errors="ignore"):
+        for line in open(file=self.__arguments["input"], mode="r", errors="ignore"):
             yield line
 
+    def __load_keywords(self):
+        for keyword in open(
+                file=pathlib.Path("filter-keywords.txt"), mode="r", errors="ignore"
+        ):
+            self.__keywords.append(keyword)
+
     def __filter_keywords(self, line):
-        for keyword in KEYWORDS:
+        for keyword in self.__keywords:
             position = line.find(keyword)
 
-
     def process(self):
-        with open(file=self.arguments["output"], mode="wb") as output:
+        with open(file=self.__arguments["output"], mode="wb") as output:
             for line in self.__input_generator():
                 encoded = line.encode("utf-8", errors="ignore")
                 output.write(encoded)
@@ -78,9 +90,14 @@ if __name__ == "__main__":
         logger.error(f"Output file exists, {PARSER.print_help()}")
 
     try:
-        check_extensions(args)
+        check_path(args["input"])
+        check_path(args["output"])
     except FileNotTxtException:
         logger.error(f"File extension has to be .txt, {PARSER.print_help()}")
+    except FileOutsideWorkingDirException:
+        logger.error(
+            f"Potential path traversal, input has to be in file-converter dir, {PARSER.print_help()}"
+        )
 
     cf = ConvertFile(args)
     cf.process()

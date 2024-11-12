@@ -17,8 +17,7 @@ jobs:
       - run: pip install -r requirements.txt
       - run: mkdir ./output
       - run: python main.py -i ./inputs/${{ inputs.input-file }} -o ./output/${{ inputs.input-file }}-output.txt
-
-      - name: Archive code coverage results
+      - name: Upload processed file
         uses: actions/upload-artifact@v4
         with:
           name: ${{ inputs.input-file }}
