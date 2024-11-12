@@ -23,6 +23,6 @@ jobs:
     strategy:
       matrix:
         inputs: ${{fromJSON(needs.find-files.outputs.inputs)}}
-    uses: skypaw/mm-recruiment/.github/workflows/reusable.yml@main
+    uses: skypaw/file-converter/.github/workflows/reusable.yml@main
     with:
       input-file: ${{ matrix.inputs }}
